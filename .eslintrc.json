@@ -1,0 +1,31 @@
+{
+    "env": {
+        "browser": true,
+        "es2021": true
+    },
+    "extends": [
+        "plugin:react/recommended",
+        "standard-with-typescript",
+        "react-app"
+    ],
+    "parserOptions": {
+        "ecmaVersion": "latest",
+        "sourceType": "module",
+        "project": ["tsconfig.json"],
+        "parser": "@typescript-eslint/parser"
+    },
+    "plugins": [
+        "react"
+    ],
+    "rules": {
+        "no-use-before-define": "off",
+        "@typescript-eslint/no-floating-promises": "error",
+        "@typescript-eslint/no-use-before-define": ["error"],
+        "react/jsx-filename-extension": [ "warn", {"extensions": [".tsx"]} ],
+        "@typescript-eslint/explicit-function-return-type": ["error", {"allowExpressions": true} ],
+        "spaced-comment": ["error", "always", {"line": {"markers": ["/"]}}]
+    },
+    "settings": {
+        "import/ignore": [".css$", "node_modules/*"]
+    }
+}
