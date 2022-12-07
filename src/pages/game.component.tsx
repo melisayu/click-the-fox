@@ -21,13 +21,14 @@ const Game = (): ReactElement => {
   const [count, setCount] = useState<number>(TIME)
   const [answers, setAnswers] = useState<Answer>({ right: 0, wrong: 0 })
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [imagesLoaded, setImagesLoaded] = useState(0)
 
   useEffect(() => {
     if (localStorage.getItem('globalState') === null) {
       // Fetch images when rendering the page.
       const requestsURLs: string[] = [ENDPOINTS.CAT_URL, ENDPOINTS.FOX_URL]
-      getAllImages(requestsURLs, dispatch).catch((error) => console.log(error))
+      getAllImages(requestsURLs, dispatch)
+        .then(() => dispatch({ type: 'SET_LOADER', payload: false }))
+        .catch((error) => console.log(error))
     }
   }, [])
 
@@ -58,22 +59,12 @@ const Game = (): ReactElement => {
     }
   }, [answers])
 
-  useEffect(() => {
-    if (imagesLoaded === NUMBER_OF_PICTURES && globalState.loading === true) {
-      dispatch({ type: 'SET_LOADER', payload: false })
-    }
-  }, [imagesLoaded])
-
   const shuffleImages = (): void => {
     globalState.images.sort((a, b) => 0.5 - Math.random())
   }
 
   const countScore = (): void => {
     setScore(answers.right > answers.wrong ? answers.right - answers.wrong : 0)
-  }
-
-  const onImageLoad = (): void => {
-    setImagesLoaded(imagesLoaded + 1)
   }
 
   const onSelectImage = (isCorrectAnswer: boolean): void => {
@@ -108,7 +99,7 @@ const Game = (): ReactElement => {
           <GameTiles>
             {globalState?.images?.map((image, index) => (
               <div onClick={() => onSelectImage(image.isCorrectAnswer)} key={index}>
-                <img key={image.key} src={image.imageUrl} alt="animal_images" onLoad={() => onImageLoad()} />
+                <img key={image.key} src={image.imageUrl} alt="animal_images" loading="eager" />
               </div>
             ))}
           </GameTiles>
