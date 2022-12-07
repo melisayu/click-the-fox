@@ -1,7 +1,8 @@
-import React, { ReactElement, useContext, useEffect, useRef, useState } from 'react'
+import React, { ReactElement, Suspense, useContext, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 import { getAllImages } from '../apis'
+import PreloadedImage from '../components/image/preloaded-image.component'
 import Modal from '../components/modal/modal.component'
 import LoadingSpinner from '../components/spinner/loading-spinner'
 import * as ENDPOINTS from '../constants/endpoints'
@@ -10,7 +11,6 @@ import { Answer } from '../types/answer.type'
 
 // Time configuration in seconds.
 const TIME = 30
-const NUMBER_OF_PICTURES = 9
 
 const Game = (): ReactElement => {
   const navigate = useNavigate()
@@ -26,46 +26,9 @@ const Game = (): ReactElement => {
     if (localStorage.getItem('globalState') === null) {
       // Fetch images when rendering the page.
       const requestsURLs: string[] = [ENDPOINTS.CAT_URL, ENDPOINTS.FOX_URL]
-      getAllImages(requestsURLs, dispatch)
-        .then(() => dispatch({ type: 'SET_LOADER', payload: false }))
-        .catch((error) => console.log(error))
+      getAllImages(requestsURLs, dispatch).catch((error) => console.log(error))
     }
-  }, [])
-
-  // Rerun effect when we update the count.
-  useEffect(() => {
-    // End game when the time is up.
-    if (count === 0) {
-      setIsModalOpen(true)
-      dispatch({ type: 'SET_SCORES', payload: score })
-      return
-    }
-
-    // Save interval to clear it when component rerenders.
-    const interval = setInterval(() => {
-      setCount(count - 1)
-    }, 1000)
-
-    return () => {
-      clearInterval(interval)
-      countScore()
-    }
-  }, [count])
-
-  useEffect(() => {
-    // Shuffle images after one of the images  is clicked.
-    if (answers.right !== 0 || answers.wrong !== 0) {
-      shuffleImages()
-    }
-  }, [answers])
-
-  const shuffleImages = (): void => {
-    globalState.images.sort((a, b) => 0.5 - Math.random())
-  }
-
-  const countScore = (): void => {
-    setScore(answers.right > answers.wrong ? answers.right - answers.wrong : 0)
-  }
+  }, [dispatch])
 
   const onSelectImage = (isCorrectAnswer: boolean): void => {
     setAnswers({
@@ -75,36 +38,76 @@ const Game = (): ReactElement => {
   }
 
   const finishGame = (): void => {
+    dispatch({ type: 'SET_SCORES', payload: score })
     setIsModalOpen(false)
     navigate('/scoreboard')
   }
 
+  // Rerun effect when we update the count.
+  useEffect(() => {
+    // End game when the time is up.
+    if (count === 0) {
+      setIsModalOpen(true)
+      return
+    }
+
+    // Score formula -> Score = SUM(fox click) – SUM(cat click)
+    const countScore = (): void => {
+      setScore(answers.right > answers.wrong ? answers.right - answers.wrong : 0)
+    }
+
+    // Start counting.
+    if (count > 0) {
+      // Save interval to clear it when component rerenders.
+      const interval = setInterval(() => {
+        setCount(count - 1)
+      }, 1000)
+
+      return () => {
+        clearInterval(interval)
+        countScore()
+      }
+    }
+  }, [count, answers.right, answers.wrong])
+
+  // Shuffle images after submitting answer.
+  useEffect(() => {
+    const shuffleImages = (): void => {
+      globalState.images.sort((a, b) => 0.5 - Math.random())
+    }
+
+    // Shuffle images after one of the images  is clicked.
+    if (answers.right !== 0 || answers.wrong !== 0) {
+      shuffleImages()
+    }
+  }, [answers, globalState.images])
+
   return (
-    <>
-    {globalState.loading === true
-      ? (<LoadingSpinner />)
-      : (<>
-          {isModalOpen && (
-            <Modal
-              onClose={() => finishGame}
-              onClickButton={() => navigate('/scoreboard')}
-              buttonText={'Score Board'}
-              text={`Your score is: ${score}`}
+    <Suspense fallback={<LoadingSpinner />}>
+      {isModalOpen && (
+        <Modal
+          onClose={() => finishGame()}
+          onClickButton={() => finishGame()}
+          buttonText={'Score Board'}
+          text={`Your score is: ${score}`}
+        />
+      )}
+      <InfoWrapper>
+        <span>Score: {score}</span>
+        <span>Time left: {count}</span>
+      </InfoWrapper>
+      <GameTiles>
+        {globalState?.images?.map((image, index) => (
+          <div onClick={() => onSelectImage(image.isCorrectAnswer)} key={index}>
+            <PreloadedImage
+              alt="animal+images"
+              src={image.imageUrl}
+              id={image.key}
             />
-          )}
-          <InfoWrapper>
-            <span>Score: {score}</span>
-            <span>Time left: {count}</span>
-          </InfoWrapper>
-          <GameTiles>
-            {globalState?.images?.map((image, index) => (
-              <div onClick={() => onSelectImage(image.isCorrectAnswer)} key={index}>
-                <img key={image.key} src={image.imageUrl} alt="animal_images" loading="eager" />
-              </div>
-            ))}
-          </GameTiles>
-        </>)}
-    </>
+          </div>
+        ))}
+      </GameTiles>
+    </Suspense>
   )
 }
 

@@ -40,11 +40,6 @@ const Reducer = (state: IGlobalState, action: ActionType): any => {
         images: [...state.images, ...catImages, foxImage]
       }
     }
-    case 'SET_LOADER':
-      return {
-        ...state,
-        loading: action.payload
-      }
     case 'PURGE_STATE':
       return initialState
     default:

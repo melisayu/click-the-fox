@@ -8,7 +8,6 @@ export interface IImage {
 }
 
 export interface IGlobalState {
-  loading: boolean
   player: string
   scores: Array<Score>
   score: number
