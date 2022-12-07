@@ -103,6 +103,7 @@ const Game = (): ReactElement => {
               alt="animal+images"
               src={image.imageUrl}
               id={image.key}
+              loading="eager"
             />
           </div>
         ))}

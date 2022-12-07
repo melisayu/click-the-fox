@@ -8,7 +8,7 @@ const WelcomeScreen = (): ReactElement => {
   const navigate = useNavigate()
 
   // States.
-  const { globalState, dispatch } = useContext(globalContext)
+  const { dispatch } = useContext(globalContext)
   const [playerName, setPlayerName] = useState('')
 
   const play = (player: string): void => {

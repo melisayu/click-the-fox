@@ -24,7 +24,8 @@
         "react/jsx-filename-extension": [ "warn", {"extensions": [".tsx"]} ],
         "@typescript-eslint/explicit-function-return-type": ["error", {"allowExpressions": true} ],
         "spaced-comment": ["error", "always", {"line": {"markers": ["/"]}}],
-        "@typescript-eslint/no-throw-literal": 0
+        "@typescript-eslint/no-throw-literal": 0,
+        "@typescript-eslint/consistent-type-assertions": "off"
     },
     "settings": {
         "import/ignore": [".css$", "node_modules/*"]
