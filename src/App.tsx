@@ -11,12 +11,15 @@ function App (): ReactElement {
     <GlobalStore>
       <div className="App">
         <header className="App-header">
-          <Routes>
-            <Route path="/" element={<WelcomeScreen />} />
-            <Route path="/game" element={<Game />} />
-            <Route path="/scoreboard" element={<ScoreBoard />} />
-          </Routes>
+          Click the Fox! Game
         </header>
+        <>
+          <Routes>
+              <Route path="/" element={<WelcomeScreen />} />
+              <Route path="/game" element={<Game />} />
+              <Route path="/scoreboard" element={<ScoreBoard />} />
+          </Routes>
+        </>
       </div>
     </GlobalStore>
   )

@@ -1,6 +1,5 @@
-import { NUMBER_OF_PICTURES } from '../pages/game.component'
 import { ActionType, IGlobalState } from '../types/store.type'
-import { idGenerator } from '../utils'
+import { generateId, getDate } from '../utils'
 import { initialState } from './context'
 
 const NUMBER_OF_CATS = 8
@@ -10,21 +9,29 @@ const Reducer = (state: IGlobalState, action: ActionType): any => {
     case 'SET_SCORES':
       return {
         ...state,
-        scores: action.payload
+        scores: [
+          ...state.scores,
+          {
+            key: generateId(),
+            name: state.player,
+            score: action.payload,
+            date: getDate()
+          }
+        ]
       }
-    case 'SET_PLAYER_SCORE':
+    case 'SET_PLAYER':
       return {
         ...state,
-        score: action.payload
+        player: action.payload
       }
     case 'SET_IMAGES': {
       const catImages = action.payload.cat?.slice(0, NUMBER_OF_CATS).map((image: { url: string }) => ({
-        key: idGenerator(),
+        key: generateId(),
         imageUrl: image.url,
         isCorrectAnswer: false
       }))
       const foxImage = {
-        key: idGenerator(),
+        key: generateId(),
         imageUrl: action.payload.fox?.image,
         isCorrectAnswer: true
       }
@@ -33,6 +40,11 @@ const Reducer = (state: IGlobalState, action: ActionType): any => {
         images: [...state.images, ...catImages, foxImage]
       }
     }
+    case 'SET_LOADER':
+      return {
+        ...state,
+        loading: action.payload
+      }
     case 'PURGE_STATE':
       return initialState
     default:

@@ -2,10 +2,12 @@ module.exports = {
   moduleDirectories: [
     "node_modules"
   ],
+  moduleNameMapper: {
+    '\\.(css|less)$': '<rootDir>/src/tests/styleMock.js',
+  },
   transform: {
-    "\\.[jt]sx?$": "babel-jest",
-    "\\.tsx?$": "ts-jest",
-    "^.+\\.ts?$": "ts-jest",
+    "^.+\\.jsx?$": "babel-jest",
+    "^.+\\.(ts|js)x?$": "ts-jest",
   },
   globals: {
     "ts-jest": {
@@ -15,4 +17,5 @@ module.exports = {
   transformIgnorePatterns: [
     "[/\\\\]node_modules[/\\\\](?!lodash-es/).+\\.js$"
   ],
+  testEnvironment: 'jsdom',
 }

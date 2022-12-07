@@ -1,4 +1,5 @@
 import React, { FunctionComponent, ReactElement } from 'react'
+import styled from 'styled-components'
 import { Score } from '../../types/score.type'
 
 interface Props {
@@ -6,31 +7,87 @@ interface Props {
 }
 
 const Table: FunctionComponent<Props> = ({ data }): ReactElement => {
-  return (
-    <div>
-      <table>
-        <tr>
-          <th>Rank</th>
-          <th>Name</th>
-          <th>Date</th>
-          <th>Score</th>
-        </tr>
-        {data?.map((value, index) => (
+  const renderScores = (data: Score[]): ReactElement => {
+    return (
+      <TableBody>
+        {data.map((value, index) => (
           <tr key={index}>
-            <td>{value.rank}</td>
+            <td>{index + 1}</td>
             <td>{value.name}</td>
             <td>{value.date}</td>
             <td>{value.score}</td>
           </tr>
         ))}
-        {data.length === 0 && (
-          <tr key={'no-date'}>
-            <td>{'There is no data available yet.'}</td>
+      </TableBody>
+    )
+  }
+
+  const renderNoData = (): ReactElement => {
+    return (
+      <TableBody>
+        <tr key={'no-date'}>
+          <td>{'There is no data available yet.'}</td>
+        </tr>
+      </TableBody>
+    )
+  }
+
+  return (
+    <TableWrapper>
+      <TableElement>
+        <TableHead>
+          <tr>
+            <th>Rank</th>
+            <NameColumn>Name</NameColumn>
+            <DateColumn>Date</DateColumn>
+            <th>Score</th>
           </tr>
-        )}
-      </table>
-    </div>
+        </TableHead>
+        {data.length > 0 ? renderScores(data) : renderNoData()}
+      </TableElement>
+    </TableWrapper>
   )
 }
+
+const TableWrapper = styled.div`
+  max-height: 60vh;
+  margin: auto;
+  overflow-y: scroll;
+  scroll-behavior: smooth;
+  width: 30em;
+  max-width: 90%;
+  margin: 2em auto;
+`
+const TableElement = styled.table`
+  background-color: white;
+`
+
+const TableHead = styled.thead`
+  background-color: #FF9E9E;
+  line-height: 2em;
+  text-align: center;
+  border: 1px solid gray;
+
+  th {
+    padding: .5em 1em;
+  }
+`
+
+const TableBody = styled.tbody`
+  line-height: 1.5em;
+
+  td {
+    border: .5px solid gray;
+    padding: .5em 1em;
+  }
+`
+
+const NameColumn = styled.th`
+  width: 100%;
+`
+
+const DateColumn = styled.th`
+  min-width: 5em;
+`
 
 export default Table

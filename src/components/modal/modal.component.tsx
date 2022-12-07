@@ -30,7 +30,6 @@ const ModalWrapper = styled.div`
   width: 100%;
   height: 100%;
   overflow: auto;
-  background-color: rgb(0,0,0);
   background-color: rgba(0,0,0,0.4);
 `
 
@@ -40,18 +39,23 @@ const ModalContent = styled.div`
   margin: auto;
   padding: 1em;
   border: 1px solid #888;
-  width: 80%;
+  width: 25em;
+  max-width: 80%;
+  border-radius: 6px;
+  padding-bottom: 2em;
 
   p {
-    color: black;
+    font-weight: 800;
+    font-size: 1.25em;
   }
 `
 
 const Close = styled.div`
-  color: #aaaaaa;
+  color: gray;
   float: right;
   font-size: 28px;
   font-weight: bold;
+  line-height: .5em;
 
   &:hover, &:focus {
     color: #000;

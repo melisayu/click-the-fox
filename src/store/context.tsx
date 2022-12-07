@@ -3,6 +3,8 @@ import Reducer from './reducer'
 import { ContextType, IGlobalState } from '../types/store.type'
 
 export const initialState: IGlobalState = {
+  loading: true,
+  player: '',
   scores: [],
   score: 0,
   images: []

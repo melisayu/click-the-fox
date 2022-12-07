@@ -1,4 +1,5 @@
 import React, { Dispatch } from 'react'
+import { Score } from './score.type'
 
 export interface IImage {
   key: string
@@ -7,7 +8,9 @@ export interface IImage {
 }
 
 export interface IGlobalState {
-  scores: Array<number>
+  loading: boolean
+  player: string
+  scores: Array<Score>
   score: number
   images: Array<IImage>
 }

@@ -2,15 +2,15 @@ import React, { ReactElement, useContext, useEffect, useRef, useState } from 're
 import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 import { getAllImages } from '../apis'
-import Button from '../components/button/button.component'
 import Modal from '../components/modal/modal.component'
+import LoadingSpinner from '../components/spinner/loading-spinner'
 import * as ENDPOINTS from '../constants/endpoints'
 import { globalContext } from '../store/context'
 import { Answer } from '../types/answer.type'
 
 // Time configuration in seconds.
 const TIME = 30
-export const NUMBER_OF_PICTURES = 9
+const NUMBER_OF_PICTURES = 9
 
 const Game = (): ReactElement => {
   const navigate = useNavigate()
@@ -21,10 +21,10 @@ const Game = (): ReactElement => {
   const [count, setCount] = useState<number>(TIME)
   const [answers, setAnswers] = useState<Answer>({ right: 0, wrong: 0 })
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [imagesLoaded, setImagesLoaded] = useState(0)
 
   useEffect(() => {
     if (localStorage.getItem('globalState') === null) {
-      console.log('how many times??111')
       // Fetch images when rendering the page.
       const requestsURLs: string[] = [ENDPOINTS.CAT_URL, ENDPOINTS.FOX_URL]
       getAllImages(requestsURLs, dispatch).catch((error) => console.log(error))
@@ -33,9 +33,10 @@ const Game = (): ReactElement => {
 
   // Rerun effect when we update the count.
   useEffect(() => {
-    // Exit when the time is up.
+    // End game when the time is up.
     if (count === 0) {
       setIsModalOpen(true)
+      dispatch({ type: 'SET_SCORES', payload: score })
       return
     }
 
@@ -57,12 +58,22 @@ const Game = (): ReactElement => {
     }
   }, [answers])
 
+  useEffect(() => {
+    if (imagesLoaded === NUMBER_OF_PICTURES && globalState.loading === true) {
+      dispatch({ type: 'SET_LOADER', payload: false })
+    }
+  }, [imagesLoaded])
+
   const shuffleImages = (): void => {
     globalState.images.sort((a, b) => 0.5 - Math.random())
   }
 
   const countScore = (): void => {
     setScore(answers.right > answers.wrong ? answers.right - answers.wrong : 0)
+  }
+
+  const onImageLoad = (): void => {
+    setImagesLoaded(imagesLoaded + 1)
   }
 
   const onSelectImage = (isCorrectAnswer: boolean): void => {
@@ -78,33 +89,52 @@ const Game = (): ReactElement => {
   }
 
   return (
-    <div>
-      {isModalOpen && (
-        <Modal
-          onClose={() => finishGame}
-          onClickButton={() => navigate('/scoreboard')}
-          buttonText={'Score Board'}
-          text={`Your score is: ${score}`}
-        />
-      )}
-      <h2>This is the game</h2>
-      <span>Score: {score}</span>
-      <span>Time left: {count}</span>
-      <GameTiles>
-        {globalState?.images?.map((image, index) => (
-          <div onClick={() => onSelectImage(image.isCorrectAnswer)} key={index}>
-            <img key={image.key} src={image.imageUrl} alt="animal_images" />
-          </div>
-        ))}
-      </GameTiles>
-    </div>
+    <>
+    {globalState.loading === true
+      ? (<LoadingSpinner />)
+      : (<>
+          {isModalOpen && (
+            <Modal
+              onClose={() => finishGame}
+              onClickButton={() => navigate('/scoreboard')}
+              buttonText={'Score Board'}
+              text={`Your score is: ${score}`}
+            />
+          )}
+          <InfoWrapper>
+            <span>Score: {score}</span>
+            <span>Time left: {count}</span>
+          </InfoWrapper>
+          <GameTiles>
+            {globalState?.images?.map((image, index) => (
+              <div onClick={() => onSelectImage(image.isCorrectAnswer)} key={index}>
+                <img key={image.key} src={image.imageUrl} alt="animal_images" onLoad={() => onImageLoad()} />
+              </div>
+            ))}
+          </GameTiles>
+        </>)}
+    </>
   )
 }
 
+const InfoWrapper = styled.div`
+  display: flex;
+  justify-content: space-evenly;
+  width: 100%;
+  font-weight: 700;
+  padding: 1em 0;
+  font-size: 1.25em;
+`
+
 const GameTiles = styled.div`
   display: grid;
-  grid-template-rows: 200px 200px 200px;
-  grid-template-columns: 200px 200px 200px;
+  grid-template-rows: 30% 30% 30%;
+  grid-template-columns: 30% 30% 30%;
+  grid-gap: 5px;
+  justify-content: center;
+  height: 100%;
+  max-width: 90vh;
+  margin: auto;
 
   img {
     display: flex;
