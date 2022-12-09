@@ -25,7 +25,6 @@ body {
   justify-content: center;
   font-size: calc(10px + 2vmin);
   padding: 1em;
-  width: 100%;
   border-bottom: 2px solid #FFCAC8;
   font-weight: 800;
 }
