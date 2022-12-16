@@ -17,7 +17,7 @@ const Game = (): ReactElement => {
 
   // States.
   const { globalState, dispatch } = useContext(globalContext)
-  const [score, setScore] = useState<number>(globalState.score)
+  const [score, setScore] = useState<number>(0)
   const [count, setCount] = useState<number>(TIME)
   const [answers, setAnswers] = useState<Answer>({ right: 0, wrong: 0 })
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -33,7 +33,7 @@ const Game = (): ReactElement => {
   const onSelectImage = (isCorrectAnswer: boolean): void => {
     setAnswers({
       right: isCorrectAnswer ? answers.right + 1 : answers.right,
-      wrong: isCorrectAnswer ? answers.wrong : answers.wrong + 1
+      wrong: !isCorrectAnswer && answers.right > answers.wrong ? answers.wrong + 1 : answers.wrong
     })
   }
 
@@ -51,11 +51,6 @@ const Game = (): ReactElement => {
       return
     }
 
-    // Score formula -> Score = SUM(fox click) – SUM(cat click)
-    const countScore = (): void => {
-      setScore(answers.right > answers.wrong ? answers.right - answers.wrong : 0)
-    }
-
     // Start counting.
     if (count > 0) {
       // Save interval to clear it when component rerenders.
@@ -65,22 +60,27 @@ const Game = (): ReactElement => {
 
       return () => {
         clearInterval(interval)
-        countScore()
       }
     }
-  }, [count, answers.right, answers.wrong])
+  }, [count])
+
+  useEffect(() => {
+    // Score formula -> Score = SUM(fox click) – SUM(cat click)
+    setScore(answers.right > answers.wrong ? answers.right - answers.wrong : 0)
+  }, [answers.right, answers.wrong])
 
   // Shuffle images after submitting answer.
   useEffect(() => {
     const shuffleImages = (): void => {
-      globalState.images.sort((a, b) => 0.5 - Math.random())
+      const randomizedImages = globalState.images.sort((a, b) => 0.5 - Math.random())
+      dispatch({ type: 'RANDOMIZE_IMAGES', payload: randomizedImages })
     }
 
     // Shuffle images after one of the images  is clicked.
     if (answers.right !== 0 || answers.wrong !== 0) {
       shuffleImages()
     }
-  }, [answers, globalState.images])
+  }, [answers, dispatch, globalState.images])
 
   return (
     <Suspense fallback={<LoadingSpinner />}>

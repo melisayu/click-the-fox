@@ -10,7 +10,6 @@ export interface IImage {
 export interface IGlobalState {
   player: string
   scores: Array<Score>
-  score: number
   images: Array<IImage>
 }
 

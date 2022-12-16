@@ -5,7 +5,6 @@ import { ContextType, IGlobalState } from '../types/store.type'
 export const initialState: IGlobalState = {
   player: '',
   scores: [],
-  score: 0,
   images: []
 }
 

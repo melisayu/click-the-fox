@@ -40,6 +40,11 @@ const Reducer = (state: IGlobalState, action: ActionType): any => {
         images: [...state.images, ...catImages, foxImage]
       }
     }
+    case 'RANDOMIZE_IMAGES':
+      return {
+        ...state,
+        images: action.payload
+      }
     case 'PURGE_STATE':
       return initialState
     default:
